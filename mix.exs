@@ -2,14 +2,14 @@ defmodule XmlBuilderPlus.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :xml_builder,
+    [app: :xml_builder_plus,
      version: "0.0.1",
      elixir: ">= 0.14.0",
      deps: deps,
      package: [
        maintainers: ["Zaali Kavelashvili", "Jorge Díaz"],
        licenses: ["MIT"],
-       links: %{github: "https://github.com/AirGateway/xml_builder"}
+       links: %{github: "https://github.com/AirGateway/xml_builder_plus"}
      ],
      description: """
      XML builder for Elixir added namespace support
