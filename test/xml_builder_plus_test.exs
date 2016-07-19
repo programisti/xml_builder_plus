@@ -1,8 +1,8 @@
-defmodule XmlBuilderTest do
+defmodule XmlBuilderPlusTest do
   use ExUnit.Case
-  doctest XmlBuilder
+  doctest XmlBuilderPlus
 
-  import XmlBuilder, only: [doc: 1, doc: 2, doc: 3, namespace: 2, namespace: 3,]
+  import XmlBuilderPlus, only: [doc: 1, doc: 2, doc: 3, namespace: 2, namespace: 3,]
 
   test "empty element" do
     assert doc(:person) == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<person/>|
@@ -65,8 +65,8 @@ defmodule XmlBuilderTest do
   end
 
   def element(name, arg),
-    do: XmlBuilder.element(name, arg) |> XmlBuilder.generate
+    do: XmlBuilderPlus.element(name, arg) |> XmlBuilderPlus.generate
 
   def element(name, attrs, content),
-    do: XmlBuilder.element(name, attrs, content) |> XmlBuilder.generate
+    do: XmlBuilderPlus.element(name, attrs, content) |> XmlBuilderPlus.generate
 end

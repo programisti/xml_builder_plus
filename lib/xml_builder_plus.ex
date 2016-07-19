@@ -4,19 +4,19 @@ defmodule XmlBuilderPlus do
 
   ## Examples
 
-      iex> XmlBuilder.doc(:person)
+      iex> XmlBuilderPlus.doc(:person)
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person/>"
 
-      iex> XmlBuilder.doc(:person, "Josh")
+      iex> XmlBuilderPlus.doc(:person, "Josh")
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person>Josh</person>"
 
-      iex> XmlBuilder.element(:person, "Josh") |> XmlBuilder.generate
+      iex> XmlBuilderPlus.element(:person, "Josh") |> XmlBuilderPlus.generate
       "<person>Josh</person>"
 
-      iex> XmlBuilder.element(:person, %{occupation: "Developer"}, "Josh") |> XmlBuilder.generate
+      iex> XmlBuilderPlus.element(:person, %{occupation: "Developer"}, "Josh") |> XmlBuilderPlus.generate
       "<person occupation=\\\"Developer\\\">Josh</person>"
 
-      iex> XmlBuilder.namespace([person: "Josh"], "s")
+      iex> XmlBuilderPlus.namespace([person: "Josh"], "s")
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<s:person>Josh</s:person>"
   """
 
