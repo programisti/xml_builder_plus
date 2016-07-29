@@ -3,11 +3,11 @@ defmodule XmlBuilderPlus.Mixfile do
 
   def project do
     [app: :xml_builder_plus,
-     version: "0.0.1",
+     version: "0.0.2",
      elixir: ">= 0.14.0",
      deps: deps,
      package: [
-       maintainers: ["Zaali Kavelashvili", "Jorge Díaz"],
+       maintainers: ["Zaali Kavelashvili", "Eloy Fernández", "Jorge Díaz"],
        licenses: ["MIT"],
        links: %{github: "https://github.com/AirGateway/xml_builder_plus"}
      ],
