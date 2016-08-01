@@ -20,13 +20,7 @@ defmodule XmlBuilderPlus do
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<s:person>Josh</s:person>"
   """
 
-  def add_soap(xml, config, method) do
-    if !is_nil(config[:soap]) do
-      {:"#{config[:soap][:request_namespace]}:Envelope", get_attributes(method, config, :envelope),[{:"#{config[:soap][:request_namespace]}:Body", get_attributes(method, config, :body), fix_structure(xml)}]}
-    else
-      xml
-    end
-  end
+
   def doc(name_or_tuple),
     do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate
 
@@ -150,15 +144,6 @@ defmodule XmlBuilderPlus do
   def generate({name, attrs, content}, level) when map_size(attrs) > 0 and is_list(content),
     do: "#{indent(level)}<#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1)}\n#{indent(level)}</#{name}>"
 
-  defp get_attributes(method, config, type) do
-    if !is_nil(config[:soap][:attributes][method][type]) do
-      envelope = %{String.replace(config[:soap][:xmlns][type], "{{namespace}}", config[:soap][:soap_namespace]) => config[:soap][:attributes][method][type]}
-      for {key, val} <- envelope, into: %{}, do: {String.to_atom(key), val}
-    else
-      %{}
-    end
-  end
-  defp fix_structure({type, attrs, _document}), do: [{type, attrs, _document}]
   defp tree_node(element_spec),
     do: element(element_spec)
 
