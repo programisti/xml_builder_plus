@@ -2,7 +2,7 @@ defmodule XmlBuilderPlusTest do
   use ExUnit.Case
   doctest XmlBuilderPlus
 
-  import XmlBuilderPlus, only: [doc: 1, doc: 2, doc: 3, namespace: 2, namespace: 3,]
+  import XmlBuilderPlus, only: [doc: 1, doc: 2, doc: 3, doc_with_namespace: 2, doc_with_namespace: 3, doc_with_namespace: 4]
 
   test "empty element" do
     assert doc(:person) == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<person/>|
@@ -60,8 +60,12 @@ defmodule XmlBuilderPlusTest do
     assert doc([person: [first: "Josh", last: "Nussbaum"]]) == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<person>\n\t<first>Josh</first>\n\t<last>Nussbaum</last>\n</person>|
   end
 
-  test "add namespace s to Keyword List" do
-    assert namespace([person: [first: "Josh", last: "Nussbaum"]], "s") == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<s:person>\n\t<s:first>Josh</s:first>\n\t<s:last>Nussbaum</s:last>\n</s:person>|
+  test "add namespace to nested keywords" do
+    assert doc_with_namespace([person: [first: "Josh", last: "Nussbaum"]], %{tag: 'ns' }) == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<ns:person>\n\t<ns:first>Josh</ns:first>\n\t<ns:last>Nussbaum</ns:last>\n</ns:person>|
+  end
+
+  test "add namespace to nested keywords excluding some node" do
+    assert doc_with_namespace([person: [first: "Josh", last: "Nussbaum"]], %{tag: 'ns', excluded_nodes: [:person]} ) == ~s|<?xml version="1.0" encoding="UTF-8" ?>\n<person>\n\t<ns:first>Josh</ns:first>\n\t<ns:last>Nussbaum</ns:last>\n</person>|
   end
 
   def element(name, arg),
