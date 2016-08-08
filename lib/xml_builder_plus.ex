@@ -20,7 +20,7 @@ defmodule XmlBuilderPlus do
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<ns:person>Josh</ns:person>"
 
       iex> XmlBuilderPlus.doc_with_namespace([person: [name: "Josh", surname: "Nash"]], %{tag: 'ns', excluded_nodes: [:person]})
-      "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person>\\n\\t<ns:name>Josh</ns:name>\\n\\t<ns:surname>Nash</ns:surname>\\n  </person>"
+      "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person>\\n\\t<ns:name>Josh</ns:name>\\n\\t<ns:surname>Nash</ns:surname>\\n</person>"
   """
 
   # namespace = %{tag: 'ns', excluded_nodes: ['Envelope', 'Header', 'Body'] }
