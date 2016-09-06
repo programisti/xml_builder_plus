@@ -1,6 +1,8 @@
 XML Builder
 =======
 
+[![Build Status](https://travis-ci.org/AirGateway/xml_builder_plus.svg?branch=master)](https://travis-ci.org/AirGateway/xml_builder_plus)
+
 ## Overview
 
 An Elixir library for building xml.
