@@ -4,35 +4,30 @@ defmodule XmlBuilderPlus do
 
   ## Examples
 
-      iex> XmlBuilderPlus.doc(:person)
+      iex> XmlBuilderPlus.doc(:person, [])
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person/>"
 
-      iex> XmlBuilderPlus.doc(:person, "Josh")
+      iex> XmlBuilderPlus.doc(:person, "Josh", [])
       "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person>Josh</person>"
 
-      iex> XmlBuilderPlus.element(:person, "Josh") |> XmlBuilderPlus.generate
+      iex> XmlBuilderPlus.element(:person, "Josh") |> XmlBuilderPlus.generate([])
       "<person>Josh</person>"
 
-      iex> XmlBuilderPlus.element(:person, %{occupation: "Developer"}, "Josh") |> XmlBuilderPlus.generate
+      iex> XmlBuilderPlus.element(:person, %{occupation: "Developer"}, "Josh") |> XmlBuilderPlus.generate([])
       "<person occupation=\\\"Developer\\\">Josh</person>"
-
-      iex> XmlBuilderPlus.doc_with_namespace([person: "Josh"], %{tag: 'ns'})
-      "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<ns:person>Josh</ns:person>"
-
-      iex> XmlBuilderPlus.doc_with_namespace([person: [name: "Josh", surname: "Nash"]], %{tag: 'ns', excluded_nodes: [:person]})
-      "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\" ?>\\n<person>\\n\\t<ns:name>Josh</ns:name>\\n\\t<ns:surname>Nash</ns:surname>\\n</person>"
   """
 
   # namespace = %{tag: 'ns', excluded_nodes: ['Envelope', 'Header', 'Body'] }
 
-  def doc(name_or_tuple, namespace_list \\ []),
-    do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate(namespace_list)
+  def doc(name, attrs, content, namespace_list),
+    do: [:_doc_type | [element(name, attrs, content)]] |> generate(namespace_list)
 
   def doc(name, attrs_or_content, namespace_list),
     do: [:_doc_type | [element(name, attrs_or_content)]] |> generate(namespace_list)
 
-  def doc(name, attrs, content, namespace_list),
-    do: [:_doc_type | [element(name, attrs, content)]] |> generate(namespace_list)
+  def doc(name_or_tuple, namespace_list \\ []),
+    do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate(namespace_list)
+
 
   def element(name) when is_bitstring(name) or is_atom(name),
     do: element({name})
