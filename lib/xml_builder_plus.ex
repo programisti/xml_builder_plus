@@ -25,14 +25,14 @@ defmodule XmlBuilderPlus do
 
   # namespace = %{tag: 'ns', excluded_nodes: ['Envelope', 'Header', 'Body'] }
 
-  def doc(name_or_tuple),
-    do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate
+  def doc(name_or_tuple, namespace_list),
+    do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate(namespace_list)
 
-  def doc(name, attrs_or_content),
-    do: [:_doc_type | [element(name, attrs_or_content)]] |> generate
+  def doc(name, namespace_list, attrs_or_content),
+    do: [:_doc_type | [element(name, attrs_or_content)]] |> generate(namespace_list)
 
-  def doc(name, attrs, content),
-    do: [:_doc_type | [element(name, attrs, content)]] |> generate
+  def doc(name, namespace_list, attrs, content),
+    do: [:_doc_type | [element(name, attrs, content)]] |> generate(namespace_list)
 
   def doc_with_namespace(name_or_tuple, namespace) when is_map(namespace),
     do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate(namespace)
@@ -71,89 +71,57 @@ defmodule XmlBuilderPlus do
   def element(name, attrs, content),
     do: element({name, attrs, content})
 
-  def generate(:_doc_type, 0),
-    do: ~s|<?xml version="1.0" encoding="UTF-8" ?>|
-
-  def generate(:_doc_type, 0, namespace) when is_map(namespace),
-    do: ~s|<?xml version="1.0" encoding="UTF-8" ?>|
-
-  def generate(any),
-    do: generate(any, 0)
-
-  def generate(any, namespace) when is_map(namespace),
-    do: generate(any, 0, namespace)
-
-  def generate(list, level, namespace) when is_list(list) and is_map(namespace),
-    do: list |> Enum.map(&(generate(&1, level, namespace))) |> Enum.intersperse("\n") |> Enum.join
-
-  def generate({name, attrs, content}, level, namespace) when (attrs == nil or map_size(attrs) == 0) and (content==nil or (is_list(content) and length(content)==0)) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name}/>"
-    else
-      "#{indent(level)}<#{name}/>"
-    end
+  def generate(:_doc_type, 0) do
+    ~s|<?xml version="1.0" encoding="UTF-8" ?>|
   end
 
-  def generate({name, attrs, content}, level, namespace) when content==nil or (is_list(content) and length(content)==0) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name} #{generate_attributes(attrs)}/>"
-    else
-      "#{indent(level)}<#{name} #{generate_attributes(attrs)}/>"
-    end
+  def generate(:_doc_type, 0, namespace, _) when is_list(namespace) do
+    ~s|<?xml version="1.0" encoding="UTF-8" ?>|
   end
 
-  def generate({name, attrs, content}, level, namespace) when (attrs == nil or map_size(attrs) == 0) and not is_list(content) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name}>#{generate_content(content, level+1, namespace)}</#{namespace.tag}:#{name}>"
-    else
-      "#{indent(level)}<#{name}>#{generate_content(content, level+1, namespace)}</#{name}>"
-    end
+  def generate(any, namespace) when is_list(namespace) do
+    generate(any, 0, namespace, "")
   end
 
-  def generate({name, attrs, content}, level, namespace) when (attrs == nil or map_size(attrs) == 0) and is_list(content) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name}>#{generate_content(content, level+1, namespace)}\n#{indent(level)}</#{namespace.tag}:#{name}>"
-    else
-      "#{indent(level)}<#{name}>#{generate_content(content, level+1, namespace)}\n#{indent(level)}</#{name}>"
-    end
+  def generate(list, level, namespace, old_namespace) when is_list(list) and is_list(namespace) do
+    list |> Enum.map(&(generate(&1, level, namespace, old_namespace))) |> Enum.intersperse("\n") |> Enum.join
   end
-  def generate({name, attrs, content}, level, namespace) when map_size(attrs) > 0 and not is_list(content) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace)}</#{namespace.tag}:#{name}>"
-    else
-      "#{indent(level)}<#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace)}</#{name}>"
-    end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when (attrs == nil or map_size(attrs) == 0) and (content==nil or (is_list(content) and length(content)==0)) do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name}/>"
+  end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when content==nil or (is_list(content) and length(content)==0) do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name} #{generate_attributes(attrs)}/>"
+  end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when (attrs == nil or map_size(attrs) == 0) and not is_list(content) do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name}>#{generate_content(content, level+1, namespace, ns)}</#{ns}#{name}>"
+  end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when (attrs == nil or map_size(attrs) == 0) and is_list(content) do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name}>#{generate_content(content, level+1, namespace, ns)}\n#{indent(level)}</#{ns}#{name}>"
+  end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when map_size(attrs) > 0 and not is_list(content)  do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace, ns)}</#{ns}#{name}>"
+  end
+  def generate({name, attrs, content}, level, namespace, old_namespace) when map_size(attrs) > 0 and is_list(content) do
+    ns = namespace[name] || old_namespace
+    "#{indent(level)}<#{ns}#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace, ns)}\n#{indent(level)}</#{ns}#{name}>"
   end
 
-  def generate({name, attrs, content}, level, namespace) when map_size(attrs) > 0 and is_list(content) and is_map(namespace) do
-    if add_namespace?(name, namespace) do
-      "#{indent(level)}<#{namespace.tag}:#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace)}\n#{indent(level)}</#{namespace.tag}:#{name}>"
-    else
-      "#{indent(level)}<#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1, namespace)}\n#{indent(level)}</#{name}>"
-    end
+
+  defp generate_content(children, level, namespace, old_namespace) when is_list(children) and is_list(namespace) do
+    "\n" <> Enum.map_join(children, "\n", &(generate(&1, level, namespace, old_namespace)))
   end
 
-  def generate(list, level) when is_list(list) and is_integer(level),
-    do: list |> Enum.map(&(generate(&1, level))) |> Enum.intersperse("\n") |> Enum.join
-
-  def generate({name, attrs, content}, level) when (attrs == nil or map_size(attrs) == 0) and (content==nil or (is_list(content) and length(content)==0) and is_integer(level)),
-    do: "#{indent(level)}<#{name}/>"
-
-  def generate({name, attrs, content}, level) when content==nil or (is_list(content) and length(content)==0) and is_integer(level),
-    do: "#{indent(level)}<#{name} #{generate_attributes(attrs)}/>"
-
-  def generate({name, attrs, content}, level) when (attrs == nil or map_size(attrs) == 0) and not is_list(content) and is_integer(level),
-    do: "#{indent(level)}<#{name}>#{generate_content(content, level+1)}</#{name}>"
-
-  def generate({name, attrs, content}, level) when (attrs == nil or map_size(attrs) == 0) and is_list(content) and is_integer(level),
-    do: "#{indent(level)}<#{name}>#{generate_content(content, level+1)}\n#{indent(level)}</#{name}>"
-
-  def generate({name, attrs, content}, level) when map_size(attrs) > 0 and not is_list(content) and is_integer(level),
-    do: "#{indent(level)}<#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1)}</#{name}>"
-
-  def generate({name, attrs, content}, level) when map_size(attrs) > 0 and is_list(content and is_integer(level)),
-    do: "#{indent(level)}<#{name} #{generate_attributes(attrs)}>#{generate_content(content, level+1)}\n#{indent(level)}</#{name}>"
-
+  defp generate_content(content, _level, namespace, old_namespace) when is_list(namespace) do
+    escape(content)
+  end
+  defp generate_attributes(attrs) do
+    Enum.map_join(attrs, " ", fn {k,v} -> "#{k}=#{quote_attribute_value(v)}" end)
+  end
   defp tree_node(element_spec),
     do: element(element_spec)
 
@@ -163,21 +131,6 @@ defmodule XmlBuilderPlus do
 
   defp add_namespace?(name, namespace),
     do: Map.has_key?(namespace, :tag) and !excluded_namespace?(name, namespace)
-
-  defp generate_content(children, level) when is_list(children),
-    do: "\n" <> Enum.map_join(children, "\n", &(generate(&1, level)))
-
-  defp generate_content(children, level, namespace) when is_list(children) and is_map(namespace),
-    do: "\n" <> Enum.map_join(children, "\n", &(generate(&1, level, namespace)))
-
-  defp generate_content(content, _level),
-    do: escape(content)
-
-  defp generate_content(content, _level, namespace) when is_map(namespace),
-    do: escape(content)
-
-  defp generate_attributes(attrs),
-    do: Enum.map_join(attrs, " ", fn {k,v} -> "#{k}=#{quote_attribute_value(v)}" end)
 
   defp indent(level),
     do: String.duplicate("\t", level)
