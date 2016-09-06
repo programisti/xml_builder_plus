@@ -28,10 +28,10 @@ defmodule XmlBuilderPlus do
   def doc(name_or_tuple, namespace_list \\ []),
     do: [:_doc_type | tree_node(name_or_tuple) |> List.wrap] |> generate(namespace_list)
 
-  def doc(name, attrs_or_content, namespace_list \\ []),
+  def doc(name, attrs_or_content, namespace_list),
     do: [:_doc_type | [element(name, attrs_or_content)]] |> generate(namespace_list)
 
-  def doc(name, attrs, content, namespace_list \\ []),
+  def doc(name, attrs, content, namespace_list),
     do: [:_doc_type | [element(name, attrs, content)]] |> generate(namespace_list)
 
   def element(name) when is_bitstring(name) or is_atom(name),
