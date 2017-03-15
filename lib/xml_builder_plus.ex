@@ -77,6 +77,9 @@ defmodule XmlBuilderPlus do
   def generate(any, namespace) when is_list(namespace) do
     generate(any, 0, namespace, "")
   end
+  def generate(any, namespace) when is_map(namespace) do
+    generate(any, 0, Map.to_list(namespace), "")
+  end
 
   def generate(list, level, namespace, old_namespace) when is_list(list) and is_list(namespace) do
     list |> Enum.map(&(generate(&1, level, namespace, old_namespace))) |> Enum.intersperse("\n") |> Enum.join
