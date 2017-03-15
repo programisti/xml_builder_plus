@@ -44,9 +44,16 @@ defmodule XmlBuilderPlus do
   def element({name, content}),
     do: element({name, nil, content})
 
-  def element({name, attrs, content}) when is_list(content),
-    do: {name, attrs, Enum.map(content, &tree_node/1)}
+  def element({name, attrs, []}) when is_map(attrs) do
+    element({name, attrs, nil})
+  end
 
+  def element({name, attrs, []})  do
+    element({name, attrs, nil})
+  end
+  def element({name, attrs, content}) when is_list(content) do
+    {name, attrs, Enum.map(content, &tree_node/1)}
+  end
   def element({name, attrs, content}),
     do: {name, attrs, content}
 
