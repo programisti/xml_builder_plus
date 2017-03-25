@@ -1,6 +1,8 @@
 XML Builder
 =======
 
+[![Build Status](https://travis-ci.org/AirGateway/xml_builder_plus.svg?branch=master)](https://travis-ci.org/AirGateway/xml_builder_plus)
+
 ## Overview
 
 An Elixir library for building xml.
@@ -28,7 +30,7 @@ end
 Like `<person id="12345">Josh</person>`, would look like:
 
 ```elixir
-{:person, %{id: 12345}, "Josh"} |> XmlBuilder.generate
+{:person, %{id: 12345}, "Josh"} |> XmlBuilderPlus.generate
 ```
 
 ### An element with child elements
@@ -36,15 +38,15 @@ Like `<person id="12345">Josh</person>`, would look like:
 Like `<person id="12345"><first>Josh</first><last>Nussbaum</last></person>`
 
 ```elixir
-{:person, %{id: 12345}, [{:first, nil, "Josh"}, {:last, nil, "Nussbaum"}]} |> XmlBuilder.generate
+{:person, %{id: 12345}, [{:first, nil, "Josh"}, {:last, nil, "Nussbaum"}]} |> XmlBuilderPlus.generate
 ```
 
 ### Convenience Functions
 
-For more readability, you can use XmlBuilder's methods instead of creating tuples manually.
+For more readability, you can use XmlBuilderPlus's methods instead of creating tuples manually.
 
 ```elixir
-XmlBuilder.doc(:person, "Josh")
+XmlBuilderPlus.doc(:person, "Josh")
 ```
 
 Outputs
@@ -59,7 +61,7 @@ Outputs
 An element can be built using multiple calls to the `element` function
 
 ```elixir
-import XmlBuilder
+import XmlBuilderPlus
 
 def person(id, first, last) do
   element(:person, %{id: id}, [
@@ -90,7 +92,7 @@ Outputs
 The previous example can be simplified using a keyed list
 
 ```elixir
-import XmlBuilder
+import XmlBuilderPlus
 
 def person(id, first, last) do
   element(:person, %{id: id}, first: first,
