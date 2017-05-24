@@ -3,16 +3,16 @@ defmodule XmlBuilderPlus.Mixfile do
 
   def project do
     [app: :xml_builder_plus,
-     version: "0.0.1",
+     version: "0.0.5",
      elixir: ">= 0.14.0",
      deps: deps,
      package: [
-       maintainers: ["Zaali Kavelashvili", "Jorge Díaz"],
+       maintainers: ["Zaali Kavelashvili", "Eloy Fernández", "Jorge Díaz"],
        licenses: ["MIT"],
        links: %{github: "https://github.com/AirGateway/xml_builder_plus"}
      ],
      description: """
-     XML builder for Elixir added namespace support
+     XML builder for Elixir (with namespaces support)
      """
    ]
   end
@@ -32,7 +32,7 @@ defmodule XmlBuilderPlus.Mixfile do
   #
   #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1"}
   #
-  # Type `mix help deps` for more examples and options
+  # Type `mix help deps` for more examples and namespace
   defp deps do
     [{:ex_doc, github: "elixir-lang/ex_doc", only: :dev}]
   end

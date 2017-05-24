@@ -1,0 +1,16 @@
+# Travis-CI configuration file
+
+language: elixir
+
+elixir:
+  - 1.3.2
+
+otp_release:
+  - 18.2.1
+
+# default commands
+# mix local.rebar --force # for Elixir 1.3.0 and up
+# mix local.hex --force
+# mix deps.get
+#
+# mix test
